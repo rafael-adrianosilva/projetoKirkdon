@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KirkDon</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="game-wrap" aria-label="KirkDon">
+        <canvas id="game" width="1920" height="1080"></canvas>
+        <div id="intro" class="intro">
+          <div class="intro-window">
+            <p class="kicker">PROFESSORA IPE</p>
+            <h1>KIRKDON</h1>
+            <p>Persodons vivem entre palcos, comicios, estudios e boatos. Antes de sair de Votuporanga, diga seu nome.</p>
+            <label for="playerName">NOME</label>
+            <input id="playerName" maxlength="24" autocomplete="off" placeholder="Matheus Benevides" />
+            <div class="starter-grid" id="starterGrid" aria-label="Escolha seu Persodon inicial"></div>
+            <button id="startGame" type="button">INICIAR</button>
+            <div class="save-load">
+              <strong>CARREGAR SAVE</strong>
+              <div class="save-grid" id="saveGrid" aria-label="Carregar jogo salvo"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <aside class="controls">
+        <strong>CONTROLES</strong>
+        <button id="fullscreenButton" type="button">TELA CHEIA</button>
+        <span>Setas/WASD: mover</span>
+        <span>Shift/B: correr com Tenis</span>
+        <span>Espaco/Enter: interagir</span>
+        <span>I: mochila</span>
+        <span>P: party</span>
+        <span>M: salvar/carregar</span>
+        <span>Batalha: 1 Fight, 2 Bag, 3 Party, R Run</span>
+        <span>Menus: setas, Enter, L, X</span>
+      </aside>
+    </main>
+    <script src="src/data.js"></script>
+    <script src="src/main.js"></script>
+  </body>
+</html>
