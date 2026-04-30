@@ -10,6 +10,25 @@
     <main class="shell">
       <section class="game-wrap" aria-label="KirkDon">
         <canvas id="game" width="1920" height="1080"></canvas>
+        <div id="mobileControls" class="mobile-controls">
+          <div class="dpad">
+            <button id="btnUp" class="dpad-btn up" aria-label="Up">▲</button>
+            <div class="dpad-mid">
+              <button id="btnLeft" class="dpad-btn left" aria-label="Left">◀</button>
+              <div class="dpad-center"></div>
+              <button id="btnRight" class="dpad-btn right" aria-label="Right">▶</button>
+            </div>
+            <button id="btnDown" class="dpad-btn down" aria-label="Down">▼</button>
+          </div>
+          <div class="action-buttons">
+            <button id="btnBag" class="action-btn bag" aria-label="Bag">I</button>
+            <button id="btnParty" class="action-btn party" aria-label="Party">P</button>
+            <button id="btnB" class="action-btn b" aria-label="B / Run">B</button>
+            <button id="btnA" class="action-btn a" aria-label="A / Interact">A</button>
+            <button id="btnMenu" class="action-btn menu" aria-label="Menu">M</button>
+          </div>
+        </div>
+
         <div id="intro" class="intro">
           <div class="intro-window">
             <p class="kicker">PROFESSORA IPE</p>

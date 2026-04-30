@@ -2313,6 +2313,12 @@
 
   function handleKeydown(event) {
     const key = event.key.toLowerCase();
+
+    // Don't prevent default if we're typing in an input
+    if (event.target.tagName === "INPUT" || event.target.tagName === "TEXTAREA") {
+      return;
+    }
+
     if (
       [
         "arrowup",
@@ -2330,6 +2336,7 @@
       event.preventDefault();
     }
     keyState.add(key);
+
 
     if (state.mode === "overworld") {
       if (key === " " || key === "enter") interact();
@@ -2441,6 +2448,40 @@
   });
   window.addEventListener("keydown", handleKeydown);
   window.addEventListener("keyup", handleKeyup);
+
+  function setupMobileControls() {
+    const buttons = {
+      btnUp: "w",
+      btnDown: "s",
+      btnLeft: "a",
+      btnRight: "d",
+      btnA: "enter",
+      btnB: "shift",
+      btnMenu: "m",
+    };
+
+    Object.entries(buttons).forEach(([id, key]) => {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+
+      const start = (e) => {
+        e.preventDefault();
+        handleKeydown({ key, target: btn, preventDefault: () => {} });
+      };
+      const end = (e) => {
+        e.preventDefault();
+        handleKeyup({ key: key.toLowerCase() });
+      };
+
+      btn.addEventListener("touchstart", start, { passive: false });
+      btn.addEventListener("touchend", end, { passive: false });
+      btn.addEventListener("mousedown", start);
+      btn.addEventListener("mouseup", end);
+      btn.addEventListener("mouseleave", end);
+    });
+  }
+  setupMobileControls();
+
 
   loadImages(imagePaths()).then(() => {
     state.ready = true;
