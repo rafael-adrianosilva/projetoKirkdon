@@ -2208,7 +2208,7 @@
       drawText(`${selected ? ">" : " "} ${shorten(item.name, 18)}${count}`, 18, y, selected ? "#e03228" : "#181818");
     });
     drawText(shorten(state.message, 32), 18, 130, "#181818");
-    drawText("ENTER USE  X BACK", 72, 144, "#181818");
+    drawText("A: USE  X: VOLTA", 72, 144, "#181818");
   }
 
   function drawPartyOverlay() {
@@ -2234,7 +2234,7 @@
       drawText(`SPA ${selected.spa} SDF ${selected.spdef}`, 134, 90, "#181818");
       drawText(`SPD ${selected.speed}`, 134, 103, "#181818");
     }
-    drawText(state.previousMode === "battle" ? "ENTER SWITCH  X BACK" : "ENTER LEAD  X BACK", 54, 144, "#181818");
+    drawText(state.previousMode === "battle" ? "A: TROCA  X: VOLTA" : "A: LIDER  X: VOLTA", 54, 144, "#181818");
   }
 
   function drawPcOverlay() {
@@ -2246,8 +2246,8 @@
     drawText(`BOXES ${state.boxes.length}`, 128, 32, "#181818");
     drawText(`BOX1 ${firstBox.length}/${BOX_SIZE}`, 128, 44, "#181818");
     boxMons.slice(0, 6).forEach((mon, index) => drawText(`${shorten(mon.name, 12)} L${mon.level}`, 128, 58 + index * 12, "#181818"));
-    drawText("1 WITHDRAW  2 DEPOSIT", 42, 132, "#181818");
-    drawText("X BACK", 98, 144, "#181818");
+    drawText("1 RETIRA  2 DEPOSITA", 42, 132, "#181818");
+    drawText("X: VOLTA", 98, 144, "#181818");
   }
 
   function drawShopOverlay() {
@@ -2262,7 +2262,7 @@
       drawText(`CK$${item.price}`, 152, y, "#181818");
     });
     drawText(shorten(state.message, 32), 18, 124, "#181818");
-    drawText("ENTER BUY  X BACK", 62, 144, "#181818");
+    drawText("A: COMPRA  X: VOLTA", 62, 144, "#181818");
   }
 
   function drawSaveOverlay() {
@@ -2281,8 +2281,8 @@
         drawText("VAZIO", 88, y + 8, "#707070");
       }
     }
-    drawText("ENTER SAVE  L LOAD", 54, 132, "#181818");
-    drawText("1-3 SLOT  X BACK", 62, 144, "#181818");
+    drawText("A: SALVA  L: CARREGA", 54, 132, "#181818");
+    drawText("1-3 SLOT  X: VOLTA", 62, 144, "#181818");
   }
 
   function formatSaveDate(savedAt) {
@@ -2460,6 +2460,7 @@
       btnMenu: "m",
       btnBag: "i",
       btnParty: "p",
+      btnX: "x",
     };
 
     Object.entries(buttons).forEach(([id, key]) => {
