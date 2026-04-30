@@ -2458,6 +2458,8 @@
       btnA: "enter",
       btnB: "shift",
       btnMenu: "m",
+      btnBag: "i",
+      btnParty: "p",
     };
 
     Object.entries(buttons).forEach(([id, key]) => {
