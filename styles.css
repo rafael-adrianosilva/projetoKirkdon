@@ -304,21 +304,21 @@ input {
 .action-buttons {
   flex-direction: row-reverse;
   align-items: flex-end;
-  gap: 30px;
+  gap: 50px;
 }
 
 .action-btn.a {
-  width: 65px;
-  height: 65px;
+  width: 75px;
+  height: 75px;
   background: rgba(224, 50, 40, 0.6);
-  font-size: 24px;
+  font-size: 28px;
 }
 
 .action-btn.b {
-  width: 55px;
-  height: 55px;
+  width: 65px;
+  height: 65px;
   background: rgba(72, 144, 248, 0.6);
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .action-btn.x {
@@ -363,38 +363,6 @@ input {
   position: absolute;
   top: 160px;
   right: 20px;
-}
-
-.num-buttons {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 15px;
-  pointer-events: auto;
-}
-
-.num-btn {
-  width: 45px;
-  height: 45px;
-  background: rgba(40, 40, 40, 0.6);
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  color: white;
-  border-radius: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 18px;
-  font-weight: bold;
-  user-select: none;
-  touch-action: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.num-btn:active {
-  background: rgba(255, 255, 255, 0.5);
-  transform: scale(0.95);
 }
 
 .intro.is-hidden + .mobile-controls {

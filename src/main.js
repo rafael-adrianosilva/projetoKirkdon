@@ -843,10 +843,11 @@
     const lines = wrap(state.battle.message, 36).slice(0, 2);
     lines.forEach((line, i) => drawText(line, 12, y + 11 + i * 12, "#181818"));
     drawWindow(262, y, 214, 38);
-    drawText("1 FIGHT", 272, y + 10, "#181818");
-    drawText("2 BAG", 350, y + 10, "#181818");
-    drawText("3 PARTY", 272, y + 25, "#181818");
-    drawText("R RUN", 350, y + 25, "#181818");
+    const idx = state.battle.actionIndex || 0;
+    drawText(`${idx === 0 ? ">" : " "} LUTA`, 272, y + 10, idx === 0 ? "#e03228" : "#181818");
+    drawText(`${idx === 1 ? ">" : " "} MOCHILA`, 350, y + 10, idx === 1 ? "#e03228" : "#181818");
+    drawText(`${idx === 2 ? ">" : " "} PARTY`, 272, y + 25, idx === 2 ? "#e03228" : "#181818");
+    drawText(`${idx === 3 ? ">" : " "} FUGA`, 350, y + 25, idx === 3 ? "#e03228" : "#181818");
   }
 
   function drawFightMenu() {
@@ -857,11 +858,12 @@
       const move = moveData(slot.id);
       const x = index % 2 === 0 ? 14 : 248;
       const y = y0 + 9 + Math.floor(index / 2) * 15;
-      const label = `${index + 1} ${shorten(move.name, 17)}`;
-      drawText(label, x, y, "#181818");
+      const selected = index === (state.battle.moveIndex || 0);
+      const label = `${selected ? ">" : " "} ${shorten(move.name, 17)}`;
+      drawText(label, x, y, selected ? "#e03228" : "#181818");
       drawText(`${slot.pp}/${slot.maxPp}`, x + 142, y, "#181818");
     });
-    drawText("X BACK", LOGICAL_W - 54, y0 - 14, "#f8f8f8", true);
+    drawText("X: VOLTA", LOGICAL_W - 54, y0 - 14, "#f8f8f8", true);
   }
 
   function drawHudBox(x, y, w, h, mon, showHpText) {
@@ -1293,6 +1295,8 @@
       finished: false,
       turnLock: false,
       menu: "action",
+      actionIndex: 0,
+      moveIndex: 0,
       turn: 1,
       participants: [player.uid],
     };
@@ -1312,27 +1316,42 @@
   function handleBattleKey(key) {
     const battle = state.battle;
     if (!battle || battle.finished || battle.turnLock) return;
+    
     if (battle.menu === "fight") {
       if (key === "x" || key === "escape") {
         battle.menu = "action";
         return;
       }
+      
+      const moveCount = battle.player.moves.length;
+      if (key === "arrowup" || key === "w") battle.moveIndex = Math.max(0, battle.moveIndex - 2);
+      if (key === "arrowdown" || key === "s") battle.moveIndex = Math.min(moveCount - 1, battle.moveIndex + 2);
+      if (key === "arrowleft" || key === "a") battle.moveIndex = Math.max(0, battle.moveIndex - 1);
+      if (key === "arrowright" || key === "d") battle.moveIndex = Math.min(moveCount - 1, battle.moveIndex + 1);
+      
+      if (key === "enter" || key === " ") chooseBattleMove(battle.moveIndex);
+      
       const index = Number(key) - 1;
       if (index >= 0 && index < 4) chooseBattleMove(index);
       return;
     }
-    if (key === "1") {
-      battle.menu = "fight";
+    
+    if (key === "arrowup" || key === "w") battle.actionIndex = Math.max(0, battle.actionIndex - 2);
+    if (key === "arrowdown" || key === "s") battle.actionIndex = Math.min(3, battle.actionIndex + 2);
+    if (key === "arrowleft" || key === "a") battle.actionIndex = Math.max(0, battle.actionIndex - 1);
+    if (key === "arrowright" || key === "d") battle.actionIndex = Math.min(3, battle.actionIndex + 1);
+    
+    if (key === "enter" || key === " ") {
+      if (battle.actionIndex === 0) battle.menu = "fight";
+      if (battle.actionIndex === 1) openBag("battle", "balls");
+      if (battle.actionIndex === 2) openParty("battle");
+      if (battle.actionIndex === 3) runBattle();
       return;
     }
-    if (key === "2") {
-      openBag("battle", "balls");
-      return;
-    }
-    if (key === "3" || key === "p") {
-      openParty("battle");
-      return;
-    }
+
+    if (key === "1") battle.menu = "fight";
+    if (key === "2") openBag("battle", "balls");
+    if (key === "3" || key === "p") openParty("battle");
     if (key === "4" || key === "r") runBattle();
   }
 
@@ -2461,10 +2480,6 @@
       btnBag: "i",
       btnParty: "p",
       btnX: "x",
-      btn1: "1",
-      btn2: "2",
-      btn3: "3",
-      btnR: "r",
     };
 
     Object.entries(buttons).forEach(([id, key]) => {
