@@ -262,17 +262,17 @@ input {
     align-items: center;
     width: 100%;
     max-width: min(100vw, 177.7778vh);
-    padding: 8px 16px;
+    padding: 10px 24px;
     gap: 20px;
   }
 }
 
 /* Shared button base */
 .dpad-btn, .action-btn {
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.35);
+  width: 52px;
+  height: 52px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -287,42 +287,46 @@ input {
 }
 
 .dpad-btn:active, .action-btn:active {
-  background: rgba(255, 255, 255, 0.5);
-  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.45);
+  transform: scale(0.9);
 }
 
-/* D-Pad */
+/* ── D-Pad ── */
 .dpad {
   pointer-events: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.dpad-mid {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.dpad-center {
-  width: 48px;
-  height: 48px;
-}
-
-/* Action buttons – 3-column grid */
-.action-buttons {
-  pointer-events: auto;
   display: grid;
-  grid-template-columns: repeat(3, auto);
-  grid-template-rows: auto auto;
-  gap: 10px;
+  grid-template-columns: 52px 52px 52px;
+  grid-template-rows: 52px 52px 52px;
+  gap: 2px;
   justify-items: center;
   align-items: center;
 }
 
-/* Remove all old absolute positioning */
+.dpad-btn.up    { grid-column: 2; grid-row: 1; }
+.dpad-btn.left  { grid-column: 1; grid-row: 2; }
+.dpad-btn.right { grid-column: 3; grid-row: 2; }
+.dpad-btn.down  { grid-column: 2; grid-row: 3; }
+
+.dpad-mid {
+  display: contents;
+}
+
+.dpad-center {
+  display: none;
+}
+
+/* ── Action buttons – diamond layout like a controller ── */
+.action-buttons {
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: 46px 58px 46px;
+  grid-template-rows: 46px 62px 46px;
+  gap: 4px;
+  justify-items: center;
+  align-items: center;
+}
+
+/* Reset old positioning */
 .action-btn.a,
 .action-btn.b,
 .action-btn.x,
@@ -333,65 +337,77 @@ input {
   margin: 0;
 }
 
+/* A = right (main action, biggest) */
 .action-btn.a {
-  width: 60px;
-  height: 60px;
+  width: 62px;
+  height: 62px;
   background: rgba(224, 50, 40, 0.55);
+  border-color: rgba(224, 50, 40, 0.7);
   font-size: 24px;
   grid-column: 3;
   grid-row: 2;
 }
 
+/* B = center-bottom (secondary action) */
 .action-btn.b {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   background: rgba(72, 144, 248, 0.55);
+  border-color: rgba(72, 144, 248, 0.7);
   grid-column: 2;
-  grid-row: 2;
+  grid-row: 3;
 }
 
+/* X = left (back) */
 .action-btn.x {
-  width: 44px;
-  height: 44px;
-  background: rgba(120, 120, 120, 0.55);
+  width: 46px;
+  height: 46px;
+  background: rgba(120, 120, 120, 0.5);
+  border-color: rgba(120, 120, 120, 0.65);
   color: #fff;
   font-size: 15px;
   grid-column: 1;
   grid-row: 2;
 }
 
+/* Menu = center-top */
 .action-btn.menu {
-  width: 44px;
-  height: 44px;
-  background: rgba(248, 208, 48, 0.55);
+  width: 46px;
+  height: 46px;
+  background: rgba(248, 208, 48, 0.5);
+  border-color: rgba(248, 208, 48, 0.65);
   color: #181818;
   font-size: 15px;
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* Bag = top-left */
+.action-btn.bag {
+  width: 42px;
+  height: 42px;
+  background: rgba(64, 184, 64, 0.5);
+  border-color: rgba(64, 184, 64, 0.65);
+  color: #fff;
+  font-size: 14px;
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* Party = top-right */
+.action-btn.party {
+  width: 42px;
+  height: 42px;
+  background: rgba(112, 88, 152, 0.5);
+  border-color: rgba(112, 88, 152, 0.65);
+  color: #fff;
+  font-size: 14px;
   grid-column: 3;
   grid-row: 1;
 }
 
-.action-btn.bag {
-  width: 44px;
-  height: 44px;
-  background: rgba(64, 184, 64, 0.55);
-  color: #fff;
-  font-size: 15px;
-  grid-column: 2;
-  grid-row: 1;
-}
-
-.action-btn.party {
-  width: 44px;
-  height: 44px;
-  background: rgba(112, 88, 152, 0.55);
-  color: #fff;
-  font-size: 15px;
-  grid-column: 1;
-  grid-row: 1;
-}
-
 /* ═══════════════════════════════════════════
-   LANDSCAPE MOBILE – controls beside the game
+   LANDSCAPE MOBILE – controls on the sides
    ═══════════════════════════════════════════ */
 @media (pointer: coarse) and (orientation: landscape),
        (max-height: 500px) and (orientation: landscape) {
@@ -407,20 +423,18 @@ input {
   }
 
   .game-wrap {
-    /* Shrink game to leave room for controls on the sides */
-    width: min(calc(100vw - 240px), 177.7778vh);
-    height: min(100vh, calc((100vw - 240px) * 0.5625));
+    width: min(calc(100vw - 280px), 177.7778vh);
+    height: min(100vh, calc((100vw - 280px) * 0.5625));
     flex-shrink: 0;
   }
 
   .mobile-controls {
-    /* In landscape: position absolutely across the full viewport */
     position: fixed;
     inset: 0;
     display: flex !important;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 12px;
+    padding: 0 10px;
     max-width: none;
     width: 100%;
     pointer-events: none;
@@ -430,15 +444,24 @@ input {
     pointer-events: auto;
   }
 
-  .dpad-btn, .action-btn {
-    width: 42px;
-    height: 42px;
+  /* Scale down D-pad for landscape */
+  .dpad {
+    grid-template-columns: 44px 44px 44px;
+    grid-template-rows: 44px 44px 44px;
+    gap: 2px;
+  }
+
+  .dpad-btn {
+    width: 44px;
+    height: 44px;
     font-size: 16px;
   }
 
-  .dpad-center {
-    width: 42px;
-    height: 42px;
+  /* Scale down action buttons for landscape */
+  .action-buttons {
+    grid-template-columns: 40px 50px 40px;
+    grid-template-rows: 40px 54px 40px;
+    gap: 3px;
   }
 
   .action-btn.a {
@@ -448,21 +471,22 @@ input {
   }
 
   .action-btn.b {
-    width: 46px;
-    height: 46px;
+    width: 48px;
+    height: 48px;
   }
 
   .action-btn.x,
-  .action-btn.menu,
-  .action-btn.bag,
-  .action-btn.party {
-    width: 38px;
-    height: 38px;
+  .action-btn.menu {
+    width: 40px;
+    height: 40px;
     font-size: 13px;
   }
 
-  .action-buttons {
-    gap: 8px;
+  .action-btn.bag,
+  .action-btn.party {
+    width: 36px;
+    height: 36px;
+    font-size: 12px;
   }
 
   .controls {
@@ -493,35 +517,54 @@ input {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 12px 20px;
+    padding: 16px 24px;
     flex: 1;
     max-width: none;
   }
 
-  .dpad-btn, .action-btn {
-    width: 50px;
-    height: 50px;
-    font-size: 18px;
+  /* Larger D-pad for portrait */
+  .dpad {
+    grid-template-columns: 56px 56px 56px;
+    grid-template-rows: 56px 56px 56px;
+    gap: 3px;
   }
 
-  .dpad-center {
-    width: 50px;
-    height: 50px;
+  .dpad-btn {
+    width: 56px;
+    height: 56px;
+    font-size: 20px;
+  }
+
+  /* Larger action buttons for portrait */
+  .action-buttons {
+    grid-template-columns: 48px 62px 48px;
+    grid-template-rows: 48px 66px 48px;
+    gap: 5px;
   }
 
   .action-btn.a {
-    width: 64px;
-    height: 64px;
+    width: 66px;
+    height: 66px;
     font-size: 26px;
   }
 
   .action-btn.b {
-    width: 54px;
-    height: 54px;
+    width: 58px;
+    height: 58px;
   }
 
-  .action-buttons {
-    gap: 10px;
+  .action-btn.x,
+  .action-btn.menu {
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+  }
+
+  .action-btn.bag,
+  .action-btn.party {
+    width: 44px;
+    height: 44px;
+    font-size: 14px;
   }
 
   .controls {
