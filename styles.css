@@ -37,8 +37,10 @@ input {
 .shell {
   position: fixed;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   padding: 0;
   background: #101018;
 }
@@ -50,6 +52,7 @@ input {
   border: 0;
   background: #101018;
   box-shadow: none;
+  flex-shrink: 0;
 }
 
 .game-wrap:fullscreen {
@@ -72,6 +75,7 @@ canvas {
   place-items: center;
   background: rgba(24, 24, 24, 0.72);
   padding: clamp(12px, 3vmin, 32px);
+  z-index: 20;
 }
 
 .intro.is-hidden {
@@ -242,135 +246,286 @@ input {
   }
 }
 
-/* Mobile Controls */
+/* ═══════════════════════════════════════════
+   MOBILE CONTROLS – positioned in the black bar
+   ═══════════════════════════════════════════ */
 .mobile-controls {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 10;
   display: none;
+  z-index: 10;
 }
 
+/* Show on touch / small screens */
 @media (max-width: 1024px), (pointer: coarse) {
   .mobile-controls {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
-    padding: 20px;
+    align-items: center;
+    width: 100%;
+    max-width: min(100vw, 177.7778vh);
+    padding: 8px 16px;
+    gap: 20px;
   }
 }
 
-.dpad, .action-buttons {
-  pointer-events: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-}
-
-.dpad-mid {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
+/* Shared button base */
 .dpad-btn, .action-btn {
-  width: 50px;
-  height: 50px;
-  background: rgba(255, 255, 255, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.35);
   color: white;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   user-select: none;
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s, transform 0.1s;
 }
 
 .dpad-btn:active, .action-btn:active {
   background: rgba(255, 255, 255, 0.5);
-  transform: scale(0.95);
+  transform: scale(0.92);
+}
+
+/* D-Pad */
+.dpad {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.dpad-mid {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .dpad-center {
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
 }
 
+/* Action buttons – 3-column grid */
 .action-buttons {
-  flex-direction: row-reverse;
-  align-items: flex-end;
-  gap: 50px;
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  grid-template-rows: auto auto;
+  gap: 10px;
+  justify-items: center;
+  align-items: center;
+}
+
+/* Remove all old absolute positioning */
+.action-btn.a,
+.action-btn.b,
+.action-btn.x,
+.action-btn.menu,
+.action-btn.bag,
+.action-btn.party {
+  position: static;
+  margin: 0;
 }
 
 .action-btn.a {
-  width: 75px;
-  height: 75px;
-  background: rgba(224, 50, 40, 0.6);
-  font-size: 28px;
+  width: 60px;
+  height: 60px;
+  background: rgba(224, 50, 40, 0.55);
+  font-size: 24px;
+  grid-column: 3;
+  grid-row: 2;
 }
 
 .action-btn.b {
-  width: 65px;
-  height: 65px;
-  background: rgba(72, 144, 248, 0.6);
-  margin-bottom: 30px;
+  width: 52px;
+  height: 52px;
+  background: rgba(72, 144, 248, 0.55);
+  grid-column: 2;
+  grid-row: 2;
 }
 
 .action-btn.x {
-  width: 45px;
-  height: 45px;
-  background: rgba(120, 120, 120, 0.6);
+  width: 44px;
+  height: 44px;
+  background: rgba(120, 120, 120, 0.55);
   color: #fff;
-  font-size: 16px;
-  position: absolute;
-  top: 230px;
-  right: 20px;
+  font-size: 15px;
+  grid-column: 1;
+  grid-row: 2;
 }
 
 .action-btn.menu {
-  width: 45px;
-  height: 45px;
-  background: rgba(248, 208, 48, 0.6);
+  width: 44px;
+  height: 44px;
+  background: rgba(248, 208, 48, 0.55);
   color: #181818;
-  font-size: 16px;
-  position: absolute;
-  top: 20px;
-  right: 20px;
+  font-size: 15px;
+  grid-column: 3;
+  grid-row: 1;
 }
 
 .action-btn.bag {
-  width: 45px;
-  height: 45px;
-  background: rgba(64, 184, 64, 0.6);
+  width: 44px;
+  height: 44px;
+  background: rgba(64, 184, 64, 0.55);
   color: #fff;
-  font-size: 16px;
-  position: absolute;
-  top: 90px;
-  right: 20px;
+  font-size: 15px;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .action-btn.party {
-  width: 45px;
-  height: 45px;
-  background: rgba(112, 88, 152, 0.6);
+  width: 44px;
+  height: 44px;
+  background: rgba(112, 88, 152, 0.55);
   color: #fff;
-  font-size: 16px;
-  position: absolute;
-  top: 160px;
-  right: 20px;
+  font-size: 15px;
+  grid-column: 1;
+  grid-row: 1;
 }
 
-.intro.is-hidden + .mobile-controls {
-  display: flex;
+/* ═══════════════════════════════════════════
+   LANDSCAPE MOBILE – controls beside the game
+   ═══════════════════════════════════════════ */
+@media (pointer: coarse) and (orientation: landscape),
+       (max-height: 500px) and (orientation: landscape) {
+  html, body {
+    overflow: hidden;
+  }
+
+  .shell {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+  }
+
+  .game-wrap {
+    /* Shrink game to leave room for controls on the sides */
+    width: min(calc(100vw - 240px), 177.7778vh);
+    height: min(100vh, calc((100vw - 240px) * 0.5625));
+    flex-shrink: 0;
+  }
+
+  .mobile-controls {
+    /* In landscape: position absolutely across the full viewport */
+    position: fixed;
+    inset: 0;
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    max-width: none;
+    width: 100%;
+    pointer-events: none;
+  }
+
+  .dpad, .action-buttons {
+    pointer-events: auto;
+  }
+
+  .dpad-btn, .action-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 16px;
+  }
+
+  .dpad-center {
+    width: 42px;
+    height: 42px;
+  }
+
+  .action-btn.a {
+    width: 54px;
+    height: 54px;
+    font-size: 22px;
+  }
+
+  .action-btn.b {
+    width: 46px;
+    height: 46px;
+  }
+
+  .action-btn.x,
+  .action-btn.menu,
+  .action-btn.bag,
+  .action-btn.party {
+    width: 38px;
+    height: 38px;
+    font-size: 13px;
+  }
+
+  .action-buttons {
+    gap: 8px;
+  }
+
+  .controls {
+    display: none !important;
+  }
 }
 
-/* Ensure intro is above controls */
-.intro {
-  z-index: 20;
+/* ═══════════════════════════════════════════
+   PORTRAIT MOBILE – controls below the game
+   ═══════════════════════════════════════════ */
+@media (pointer: coarse) and (orientation: portrait),
+       (max-width: 768px) and (orientation: portrait) {
+  .shell {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0;
+  }
+
+  .game-wrap {
+    width: 100vw;
+    height: 56.25vw; /* 16:9 */
+    flex-shrink: 0;
+  }
+
+  .mobile-controls {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 12px 20px;
+    flex: 1;
+    max-width: none;
+  }
+
+  .dpad-btn, .action-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+  }
+
+  .dpad-center {
+    width: 50px;
+    height: 50px;
+  }
+
+  .action-btn.a {
+    width: 64px;
+    height: 64px;
+    font-size: 26px;
+  }
+
+  .action-btn.b {
+    width: 54px;
+    height: 54px;
+  }
+
+  .action-buttons {
+    gap: 10px;
+  }
+
+  .controls {
+    display: none !important;
+  }
 }
 
