@@ -2461,6 +2461,10 @@
       btnBag: "i",
       btnParty: "p",
       btnX: "x",
+      btn1: "1",
+      btn2: "2",
+      btn3: "3",
+      btnR: "r",
     };
 
     Object.entries(buttons).forEach(([id, key]) => {
