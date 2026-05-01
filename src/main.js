@@ -2133,24 +2133,37 @@
       closeOverlay();
       return;
     }
-    if (key === "1") {
-      if (state.party.length >= 6 || boxCount() === 0) {
-        state.message = "Nao da para retirar agora.";
-        return;
-      }
-      const mon = withdrawFirstFromPc();
-      state.party.push(mon);
-      state.message = `${mon.name} saiu do PC.`;
+    if (key === "1" || key === "enter" || key === " ") {
+      withdrawFromPcToParty();
+      return;
     }
-    if (key === "2") {
-      if (state.party.length <= 1) {
-        state.message = "Voce precisa manter 1 Persodon.";
-        return;
-      }
-      const mon = state.party.pop();
-      const boxNumber = storeInPc(mon);
-      state.message = `${mon.name} foi para o PC Box ${boxNumber}.`;
+    if (key === "2" || key === "shift" || key === "b") {
+      depositPartyMonToPc();
     }
+  }
+
+  function withdrawFromPcToParty() {
+    if (state.party.length >= 6 || boxCount() === 0) {
+      state.message = "Nao da para retirar agora.";
+      return;
+    }
+    const mon = withdrawFirstFromPc();
+    if (!mon) {
+      state.message = "Box vazia.";
+      return;
+    }
+    state.party.push(mon);
+    state.message = `${mon.name} saiu do PC.`;
+  }
+
+  function depositPartyMonToPc() {
+    if (state.party.length <= 1) {
+      state.message = "Voce precisa manter 1 Persodon.";
+      return;
+    }
+    const mon = state.party.pop();
+    const boxNumber = storeInPc(mon);
+    state.message = `${mon.name} foi para o PC Box ${boxNumber}.`;
   }
 
   function handleShopKey(key) {
@@ -2265,8 +2278,9 @@
     drawText(`BOXES ${state.boxes.length}`, 128, 32, "#181818");
     drawText(`BOX1 ${firstBox.length}/${BOX_SIZE}`, 128, 44, "#181818");
     boxMons.slice(0, 6).forEach((mon, index) => drawText(`${shorten(mon.name, 12)} L${mon.level}`, 128, 58 + index * 12, "#181818"));
-    drawText("1 RETIRA  2 DEPOSITA", 42, 132, "#181818");
-    drawText("X: VOLTA", 98, 144, "#181818");
+    drawText(shorten(state.message, 42), 18, 146, "#181818");
+    drawText("A/1 RETIRA  B/2 DEPOSITA", 24, 162, "#181818");
+    drawText("X: VOLTA", 98, 176, "#181818");
   }
 
   function drawShopOverlay() {
@@ -2486,20 +2500,47 @@
       const btn = document.getElementById(id);
       if (!btn) return;
 
+      let pressed = false;
+      let pointerId = null;
+
       const start = (e) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
         e.preventDefault();
+        if (pressed) return;
+        pressed = true;
+        pointerId = e.pointerId ?? null;
+        if (pointerId !== null) {
+          try {
+            btn.setPointerCapture?.(pointerId);
+          } catch (error) {
+            // Programmatic pointer events may not have an active capture target.
+          }
+        }
         handleKeydown({ key, target: btn, preventDefault: () => {} });
       };
       const end = (e) => {
         e.preventDefault();
+        if (!pressed) return;
+        if (pointerId !== null && e.pointerId !== undefined && e.pointerId !== pointerId) return;
+        pressed = false;
+        if (pointerId !== null && btn.hasPointerCapture?.(pointerId)) btn.releasePointerCapture(pointerId);
+        pointerId = null;
         handleKeyup({ key: key.toLowerCase() });
       };
 
-      btn.addEventListener("touchstart", start, { passive: false });
-      btn.addEventListener("touchend", end, { passive: false });
-      btn.addEventListener("mousedown", start);
-      btn.addEventListener("mouseup", end);
-      btn.addEventListener("mouseleave", end);
+      if (window.PointerEvent) {
+        btn.addEventListener("pointerdown", start);
+        btn.addEventListener("pointerup", end);
+        btn.addEventListener("pointercancel", end);
+        btn.addEventListener("lostpointercapture", end);
+      } else {
+        btn.addEventListener("touchstart", start, { passive: false });
+        btn.addEventListener("touchend", end, { passive: false });
+        btn.addEventListener("touchcancel", end, { passive: false });
+        btn.addEventListener("mousedown", start);
+        btn.addEventListener("mouseup", end);
+        btn.addEventListener("mouseleave", end);
+      }
     });
   }
   setupMobileControls();

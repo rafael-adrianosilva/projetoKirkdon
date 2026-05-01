@@ -2,7 +2,7 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
     <title>KirkDon</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -29,21 +29,37 @@
       </section>
       <div id="mobileControls" class="mobile-controls">
         <div class="dpad">
-          <button id="btnUp" class="dpad-btn up" aria-label="Up">▲</button>
+          <button id="btnUp" class="dpad-btn up" type="button" aria-label="Cima">▲</button>
           <div class="dpad-mid">
-            <button id="btnLeft" class="dpad-btn left" aria-label="Left">◀</button>
+            <button id="btnLeft" class="dpad-btn left" type="button" aria-label="Esquerda">◀</button>
             <div class="dpad-center"></div>
-            <button id="btnRight" class="dpad-btn right" aria-label="Right">▶</button>
+            <button id="btnRight" class="dpad-btn right" type="button" aria-label="Direita">▶</button>
           </div>
-          <button id="btnDown" class="dpad-btn down" aria-label="Down">▼</button>
+          <button id="btnDown" class="dpad-btn down" type="button" aria-label="Baixo">▼</button>
         </div>
         <div class="action-buttons">
-          <button id="btnX" class="action-btn x" aria-label="X / Back">X</button>
-          <button id="btnBag" class="action-btn bag" aria-label="Bag">I</button>
-          <button id="btnParty" class="action-btn party" aria-label="Party">P</button>
-          <button id="btnB" class="action-btn b" aria-label="B / Run">B</button>
-          <button id="btnA" class="action-btn a" aria-label="A / Interact">A</button>
-          <button id="btnMenu" class="action-btn menu" aria-label="Menu">M</button>
+          <button id="btnX" class="action-btn x" type="button" aria-label="Voltar">
+            <span class="mobile-icon back-icon" aria-hidden="true"></span>
+          </button>
+          <button id="btnBag" class="action-btn bag" type="button" aria-label="Mochila">
+            <span class="mobile-icon bag-icon" aria-hidden="true"></span>
+          </button>
+          <button id="btnParty" class="action-btn party" type="button" aria-label="Party">
+            <span class="mobile-icon party-icon" aria-hidden="true">
+              <span class="don don-a"></span>
+              <span class="don don-b"></span>
+              <span class="don don-c"></span>
+            </span>
+          </button>
+          <button id="btnB" class="action-btn b" type="button" aria-label="Correr ou depositar no PC">
+            <span class="mobile-icon run-icon" aria-hidden="true"></span>
+          </button>
+          <button id="btnA" class="action-btn a" type="button" aria-label="Interagir ou confirmar">
+            <span class="mobile-icon interact-icon" aria-hidden="true"></span>
+          </button>
+          <button id="btnMenu" class="action-btn menu" type="button" aria-label="Salvar e carregar">
+            <span class="mobile-icon menu-icon" aria-hidden="true"></span>
+          </button>
         </div>
       </div>
       <aside class="controls">
@@ -56,6 +72,7 @@
         <span>P: party</span>
         <span>M: salvar/carregar</span>
         <span>Batalha: 1 Fight, 2 Bag, 3 Party, R Run</span>
+        <span>PC: A/1 retira, B/2 deposita</span>
         <span>Menus: setas, Enter, L, X</span>
       </aside>
     </main>
