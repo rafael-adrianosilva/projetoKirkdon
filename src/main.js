@@ -73,6 +73,10 @@
     menuPocket: 0,
     menuIndex: 0,
     partyIndex: 0,
+    pcColumn: "party",
+    pcPartyIndex: 0,
+    pcBoxIndex: 0,
+    pcFlash: 0,
     saveIndex: 0,
     shopIndex: 0,
     screenShake: 0,
@@ -1694,6 +1698,15 @@
     return state.boxes.reduce((mons, box) => mons.concat(box), []);
   }
 
+  function boxEntries() {
+    normalizeBoxes();
+    const entries = [];
+    state.boxes.forEach((box, boxIndex) => {
+      box.forEach((mon, index) => entries.push({ box, boxIndex, index, mon }));
+    });
+    return entries;
+  }
+
   function boxCount() {
     return allBoxMons().length;
   }
@@ -1707,14 +1720,6 @@
     }
     box.push(mon);
     return state.boxes.indexOf(box) + 1;
-  }
-
-  function withdrawFirstFromPc() {
-    normalizeBoxes();
-    for (const box of state.boxes) {
-      if (box.length) return box.shift();
-    }
-    return null;
   }
 
   function copyMonForStorage(mon) {
@@ -1916,6 +1921,10 @@
   function openPc() {
     state.previousMode = "overworld";
     state.mode = "pc";
+    state.pcColumn = "party";
+    state.pcPartyIndex = Math.min(state.pcPartyIndex || 0, Math.max(0, state.party.length - 1));
+    state.pcBoxIndex = Math.min(state.pcBoxIndex || 0, Math.max(0, boxCount() - 1));
+    state.pcFlash = 0;
   }
 
   function openShop() {
@@ -2133,36 +2142,104 @@
       closeOverlay();
       return;
     }
-    if (key === "1" || key === "enter" || key === " ") {
-      withdrawFromPcToParty();
+    if (key === "arrowleft" || key === "a") {
+      state.pcColumn = "party";
+      return;
+    }
+    if (key === "arrowright" || key === "d") {
+      state.pcColumn = "box";
+      return;
+    }
+    if (key === "arrowup" || key === "w") {
+      movePcSelection(-1);
+      return;
+    }
+    if (key === "arrowdown" || key === "s") {
+      movePcSelection(1);
+      return;
+    }
+    if (key === "1") {
+      state.pcColumn = "box";
+      withdrawSelectedFromPc();
       return;
     }
     if (key === "2" || key === "shift" || key === "b") {
-      depositPartyMonToPc();
+      state.pcColumn = "party";
+      depositSelectedPartyMon();
+      return;
+    }
+    if (key === "enter" || key === " ") {
+      transferSelectedPcMon();
     }
   }
 
-  function withdrawFromPcToParty() {
+  function ensurePcSelection() {
+    state.pcColumn = state.pcColumn === "box" ? "box" : "party";
+    state.pcPartyIndex = Math.max(0, Math.min(state.pcPartyIndex || 0, Math.max(0, state.party.length - 1)));
+    state.pcBoxIndex = Math.max(0, Math.min(state.pcBoxIndex || 0, Math.max(0, boxCount() - 1)));
+  }
+
+  function movePcSelection(delta) {
+    ensurePcSelection();
+    if (state.pcColumn === "party") {
+      state.pcPartyIndex = Math.max(0, Math.min(state.pcPartyIndex + delta, Math.max(0, state.party.length - 1)));
+    } else {
+      state.pcBoxIndex = Math.max(0, Math.min(state.pcBoxIndex + delta, Math.max(0, boxCount() - 1)));
+    }
+  }
+
+  function selectedBoxEntry() {
+    const entries = boxEntries();
+    return entries[Math.max(0, Math.min(state.pcBoxIndex || 0, entries.length - 1))] || null;
+  }
+
+  function selectedPcMon() {
+    ensurePcSelection();
+    if (state.pcColumn === "party") return state.party[state.pcPartyIndex] || null;
+    return selectedBoxEntry()?.mon || null;
+  }
+
+  function transferSelectedPcMon() {
+    if (state.pcColumn === "party") {
+      depositSelectedPartyMon();
+    } else {
+      withdrawSelectedFromPc();
+    }
+  }
+
+  function withdrawSelectedFromPc() {
+    ensurePcSelection();
     if (state.party.length >= 6 || boxCount() === 0) {
       state.message = "Nao da para retirar agora.";
       return;
     }
-    const mon = withdrawFirstFromPc();
-    if (!mon) {
+    const entry = selectedBoxEntry();
+    if (!entry) {
       state.message = "Box vazia.";
       return;
     }
+    const [mon] = entry.box.splice(entry.index, 1);
     state.party.push(mon);
+    state.pcColumn = "party";
+    state.pcPartyIndex = state.party.length - 1;
+    state.pcBoxIndex = Math.max(0, Math.min(state.pcBoxIndex, Math.max(0, boxCount() - 1)));
+    state.pcFlash = 18;
     state.message = `${mon.name} saiu do PC.`;
   }
 
-  function depositPartyMonToPc() {
+  function depositSelectedPartyMon() {
+    ensurePcSelection();
     if (state.party.length <= 1) {
       state.message = "Voce precisa manter 1 Persodon.";
       return;
     }
-    const mon = state.party.pop();
+    const index = Math.max(0, Math.min(state.pcPartyIndex, state.party.length - 1));
+    const [mon] = state.party.splice(index, 1);
     const boxNumber = storeInPc(mon);
+    state.pcColumn = "box";
+    state.pcPartyIndex = Math.max(0, Math.min(index, state.party.length - 1));
+    state.pcBoxIndex = Math.max(0, boxCount() - 1);
+    state.pcFlash = 18;
     state.message = `${mon.name} foi para o PC Box ${boxNumber}.`;
   }
 
@@ -2270,17 +2347,78 @@
   }
 
   function drawPcOverlay() {
+    ensurePcSelection();
     drawOverlayBase("PC BOX");
-    drawText(`PARTY ${state.party.length}/6`, 16, 32, "#181818");
-    state.party.slice(0, 6).forEach((mon, index) => drawText(`${index + 1} ${shorten(mon.name, 12)} L${mon.level}`, 18, 48 + index * 12, "#181818"));
-    const boxMons = allBoxMons();
+    const boxEntriesList = boxEntries();
     const firstBox = state.boxes[0] || [];
-    drawText(`BOXES ${state.boxes.length}`, 128, 32, "#181818");
-    drawText(`BOX1 ${firstBox.length}/${BOX_SIZE}`, 128, 44, "#181818");
-    boxMons.slice(0, 6).forEach((mon, index) => drawText(`${shorten(mon.name, 12)} L${mon.level}`, 128, 58 + index * 12, "#181818"));
-    drawText(shorten(state.message, 42), 18, 146, "#181818");
-    drawText("A/1 RETIRA  B/2 DEPOSITA", 24, 162, "#181818");
-    drawText("X: VOLTA", 98, 176, "#181818");
+    const boxStart = Math.max(0, Math.min(state.pcBoxIndex - 5, Math.max(0, boxEntriesList.length - 6)));
+
+    drawText(`PARTY ${state.party.length}/6`, 18, 32, state.pcColumn === "party" ? "#e03228" : "#181818");
+    drawText(`BOX1 ${firstBox.length}/${BOX_SIZE}`, 322, 32, state.pcColumn === "box" ? "#e03228" : "#181818");
+
+    for (let i = 0; i < 6; i++) {
+      const mon = state.party[i];
+      const y = 50 + i * 17;
+      drawPcRow(16, y, 150, mon, i, state.pcColumn === "party" && i === state.pcPartyIndex);
+    }
+
+    for (let i = 0; i < 6; i++) {
+      const entry = boxEntriesList[boxStart + i];
+      const y = 50 + i * 17;
+      drawPcRow(314, y, 150, entry?.mon, boxStart + i, state.pcColumn === "box" && boxStart + i === state.pcBoxIndex);
+    }
+
+    drawSelectedPcPreview();
+    drawText(shorten(state.message, 48), 24, 176, "#181818");
+    drawText("SETAS: SELECIONA  A: TRANSFERE", 24, 194, "#181818");
+    drawText("B/2: DEPOSITA  1: RETIRA  X: VOLTA", 24, 210, "#181818");
+  }
+
+  function drawPcRow(x, y, w, mon, index, selected) {
+    if (selected) {
+      const pulse = state.pcFlash > 0 || Math.floor(state.frame / 12) % 2 === 0;
+      ctx.fillStyle = pulse ? "#f8d030" : "#fff0d0";
+      ctx.fillRect(x - 2, y - 3, w, 15);
+      ctx.strokeStyle = "#e03228";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x - 3, y - 4, w + 2, 17);
+    }
+    if (!mon) {
+      drawText("--", x + 4, y, "#707070");
+      return;
+    }
+    drawText(`${selected ? ">" : " "}${index + 1} ${shorten(mon.name, 12)} L${mon.level}`, x + 4, y, selected ? "#e03228" : "#181818");
+    drawText(`${mon.hp}/${mon.maxHp}`, x + 92, y, "#181818");
+  }
+
+  function drawSelectedPcPreview() {
+    const mon = selectedPcMon();
+    drawWindow(184, 42, 112, 120);
+    drawText(state.pcColumn === "party" ? "DEPOSITAR" : "RETIRAR", 204, 54, "#e03228");
+    const arrow = state.pcColumn === "party" ? ">>" : "<<";
+    const arrowX = state.pcColumn === "party" ? 238 : 214;
+    drawText(arrow, arrowX + (Math.floor(state.frame / 10) % 2), 134, "#e03228", true);
+    if (!mon) {
+      drawText("VAZIO", 222, 92, "#707070");
+      return;
+    }
+    const bounce = state.pcFlash > 0 ? Math.round(Math.sin(state.pcFlash * 0.75) * 4) : Math.round(Math.sin(state.frame / 12) * 1);
+    drawMonSprite(mon, 222, 76 + bounce, 38);
+    drawText(shorten(mon.name, 14), 198, 120, "#181818");
+    drawText(`L${mon.level} ${mon.hp}/${mon.maxHp}`, 210, 146, "#181818");
+  }
+
+  function drawMonSprite(mon, x, y, size) {
+    const img = images[mon.sprite];
+    if (img) {
+      ctx.drawImage(img, x, y, size, size);
+      return;
+    }
+    ctx.fillStyle = "#4890f8";
+    ctx.fillRect(x + 6, y + 6, size - 12, size - 12);
+    ctx.fillStyle = "#f8d030";
+    ctx.fillRect(x + 14, y + 14, 4, 4);
+    ctx.fillRect(x + size - 18, y + 14, 4, 4);
   }
 
   function drawShopOverlay() {
@@ -2419,6 +2557,7 @@
     state.frame++;
     if (state.inputCooldown > 0) state.inputCooldown--;
     if (state.screenShake > 0) state.screenShake--;
+    if (state.pcFlash > 0) state.pcFlash--;
     updateCutscene();
     const [mx, my] = movementVector();
     state.walking = state.mode === "overworld" && !state.cutscene && (mx !== 0 || my !== 0);
